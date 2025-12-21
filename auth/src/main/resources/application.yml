@@ -1,0 +1,38 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/webrtc_auth
+
+eureka:
+  client:
+    enabled: false
+
+jwt:
+  secret: your-super-secret-key-change-in-production-minimum-256-bits
+  expiration: 86400000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://mongodb:27017/webrtc_auth
+    redis:
+      host: redis
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://gateway:8080/eureka/
