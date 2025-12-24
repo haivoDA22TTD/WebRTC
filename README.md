@@ -106,8 +106,8 @@ cd WebRTC
 
 ☁️ Triển khai Cloud (AWS / GCP)
 
-## 👨‍💻 Tác gi
-Võ chí Hải(haivoDev)
+## 👨‍💻 Tác giả
+Võ Chí Hải(**haivoDev**)
 ## ⭐ Đóng góp
 
 Nếu bạn thấy dự án hữu ích, hãy ⭐ Star repository để ủng hộ nhé!
