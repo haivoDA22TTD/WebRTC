@@ -57,7 +57,7 @@ Hệ thống được thiết kế theo **mô hình Microservices**, dễ mở r
 - 🔐 **Spring Security**
 - 🌐 **WebSocket**
 - 🎥 **WebRTC Signaling**
-- 🐬 **MySQL**
+- <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mongodb.svg" width="18"/> **MongoDB**
 
 ### 🔹 Frontend
 - ⚛️ **React**
@@ -68,11 +68,6 @@ Hệ thống được thiết kế theo **mô hình Microservices**, dễ mở r
 - 🐳 **Docker & Docker Compose**
 - 🔁 **GitHub Actions (CI/CD)**
 - 🌐 **Nginx**
-
----
-
-## 📂 Cấu trúc thư mục
-
 
 ---
 
