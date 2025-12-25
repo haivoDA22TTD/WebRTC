@@ -1,0 +1,170 @@
+services:
+  # Infrastructure
+  mongodb:
+    image: mongo:7
+    container_name: webrtc-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - webrtc-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: webrtc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - webrtc-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: webrtc-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - webrtc-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: webrtc-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - webrtc-network
+
+  # Microservices
+  gateway:
+    build: ./gateway
+    container_name: webrtc-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - webrtc-network
+
+  auth-service:
+    build: ./auth
+    container_name: webrtc-auth
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_auth
+      - SPRING_DATA_REDIS_HOST=redis
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+    depends_on:
+      - gateway
+      - mongodb
+      - redis
+    networks:
+      - webrtc-network
+
+  room-service:
+    build: ./room
+    container_name: webrtc-room
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_room
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+    depends_on:
+      - gateway
+      - mongodb
+      - redis
+      - kafka
+    networks:
+      - webrtc-network
+
+  signaling-service:
+    build: ./signaling
+    container_name: webrtc-signaling
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+    depends_on:
+      - gateway
+      - redis
+      - kafka
+    networks:
+      - webrtc-network
+
+  chat-service:
+    build: ./chat
+    container_name: webrtc-chat
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_chat
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+    depends_on:
+      - gateway
+      - mongodb
+      - redis
+      - kafka
+    networks:
+      - webrtc-network
+
+  profile-service:
+    build: ./profile
+    container_name: webrtc-profile
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_profile
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+    depends_on:
+      - gateway
+      - mongodb
+      - redis
+    networks:
+      - webrtc-network
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: webrtc-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - gateway
+    networks:
+      - webrtc-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  webrtc-network:
+    driver: bridge
