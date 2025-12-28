@@ -46,6 +46,22 @@ services:
     networks:
       - webrtc-network
 
+  # Eureka Server (Service Registry)
+  eureka-server:
+    build: ./eureka-server
+    container_name: webrtc-eureka
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - webrtc-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Microservices
   gateway:
     build: ./gateway
@@ -54,9 +70,14 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - mongodb
-      - redis
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - webrtc-network
 
@@ -69,11 +90,14 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_auth
       - SPRING_DATA_REDIS_HOST=redis
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - gateway
-      - mongodb
-      - redis
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - webrtc-network
 
@@ -87,12 +111,16 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_room
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - gateway
-      - mongodb
-      - redis
-      - kafka
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
       - webrtc-network
 
@@ -105,11 +133,14 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - gateway
-      - redis
-      - kafka
+      eureka-server:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
       - webrtc-network
 
@@ -123,12 +154,16 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_chat
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - gateway
-      - mongodb
-      - redis
-      - kafka
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
       - webrtc-network
 
@@ -142,11 +177,14 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_profile
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gateway:8080/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
-      - gateway
-      - mongodb
-      - redis
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - webrtc-network
 
