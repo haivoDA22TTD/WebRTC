@@ -257,9 +257,42 @@ jobs:
     outputs:
       changed: ${{ steps.changes.outputs.src }}
 
+  # ==================== EUREKA SERVER ====================
+  eureka-server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: eureka-server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'eureka-server/**'
+
+      - name: Setup Java 17
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: eureka-server/pom.xml
+
+      - name: Build & Test
+        if: steps.changes.outputs.src == 'true'
+        run: ./mvnw clean verify -B
+
+    outputs:
+      changed: ${{ steps.changes.outputs.src }}
+
   # ==================== BUILD & PUSH DOCKER IMAGES ====================
   docker:
-    needs: [frontend, gateway, auth, room, signaling, chat, profile]
+    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -283,6 +316,8 @@ jobs:
             context: ./chat
           - service: profile
             context: ./profile
+          - service: eureka-server
+            context: ./eureka-server
     steps:
       - uses: actions/checkout@v4
 
@@ -297,6 +332,7 @@ jobs:
             signaling) echo "changed=${{ needs.signaling.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             chat) echo "changed=${{ needs.chat.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             profile) echo "changed=${{ needs.profile.outputs.changed }}" >> $GITHUB_OUTPUT ;;
+            eureka-server) echo "changed=${{ needs.eureka-server.outputs.changed }}" >> $GITHUB_OUTPUT ;;
           esac
 
       - name: Login to GitHub Container Registry
