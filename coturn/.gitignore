@@ -1,0 +1,5 @@
+# Keep turnserver.conf but ignore any local overrides
+*.local.conf
+*.pem
+*.crt
+*.key

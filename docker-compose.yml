@@ -46,6 +46,42 @@ services:
     networks:
       - webrtc-network
 
+  # TURN/STUN Server (coturn)
+  coturn:
+    image: coturn/coturn:4.6
+    container_name: webrtc-coturn
+    ports:
+      - "3478:3478"          # STUN/TURN UDP
+      - "3478:3478/udp"
+      - "5349:5349"          # STUN/TURN TLS
+      - "5349:5349/udp"
+      - "49152-49200:49152-49200/udp"  # Relay ports
+    environment:
+      - TURN_REALM=${TURN_REALM:-webrtc.local}
+      - TURN_SECRET=${TURN_SECRET:-webrtc-secret-key}
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    networks:
+      - webrtc-network
+    restart: unless-stopped
+
+  # SFU Server (mediasoup)
+  sfu:
+    build: ./sfu
+    container_name: webrtc-sfu
+    ports:
+      - "4000:4000"          # Socket.IO
+      - "40000-40100:40000-40100/udp"  # RTC ports
+    environment:
+      - PORT=4000
+      - MEDIASOUP_LISTEN_IP=0.0.0.0
+      - MEDIASOUP_ANNOUNCED_IP=${SFU_ANNOUNCED_IP:-127.0.0.1}
+      - RTC_MIN_PORT=40000
+      - RTC_MAX_PORT=40100
+    networks:
+      - webrtc-network
+    restart: unless-stopped
+
   # Eureka Server (Service Registry)
   eureka-server:
     build: ./eureka-server
