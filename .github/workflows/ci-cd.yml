@@ -290,9 +290,39 @@ jobs:
     outputs:
       changed: ${{ steps.changes.outputs.src }}
 
+  # ==================== SFU SERVER (Node.js) ====================
+  sfu:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sfu
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'sfu/**'
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        if: steps.changes.outputs.src == 'true'
+        run: npm install
+
+    outputs:
+      changed: ${{ steps.changes.outputs.src }}
+
   # ==================== BUILD & PUSH DOCKER IMAGES ====================
   docker:
-    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server]
+    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server, sfu]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -318,6 +348,8 @@ jobs:
             context: ./profile
           - service: eureka-server
             context: ./eureka-server
+          - service: sfu
+            context: ./sfu
     steps:
       - uses: actions/checkout@v4
 
@@ -333,6 +365,7 @@ jobs:
             chat) echo "changed=${{ needs.chat.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             profile) echo "changed=${{ needs.profile.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             eureka-server) echo "changed=${{ needs.eureka-server.outputs.changed }}" >> $GITHUB_OUTPUT ;;
+            sfu) echo "changed=${{ needs.sfu.outputs.changed }}" >> $GITHUB_OUTPUT ;;
           esac
 
       - name: Login to GitHub Container Registry
@@ -367,3 +400,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # ==================== DEPLOY (Uncomment and configure when ready) ====================
+  # deploy:
+  #   needs: docker
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy to server via SSH
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.DEPLOY_HOST }}
+  #         username: ${{ secrets.DEPLOY_USER }}
+  #         key: ${{ secrets.DEPLOY_SSH_KEY }}
+  #         script: |
+  #           cd /path/to/your/app
+  #           docker-compose pull
+  #           docker-compose up -d --remove-orphans

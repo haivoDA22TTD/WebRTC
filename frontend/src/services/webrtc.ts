@@ -1,10 +1,30 @@
 import { socketService } from './socket';
 
+// ICE servers configuration with STUN and TURN
+const TURN_URL = import.meta.env.VITE_TURN_URL || 'localhost';
+const TURN_USERNAME = import.meta.env.VITE_TURN_USERNAME || 'webrtc';
+const TURN_PASSWORD = import.meta.env.VITE_TURN_PASSWORD || 'webrtc123';
+
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
+    // Public STUN servers (fallback)
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
+    // Local STUN server
+    { urls: `stun:${TURN_URL}:3478` },
+    // TURN server (relay for NAT traversal)
+    {
+      urls: `turn:${TURN_URL}:3478`,
+      username: TURN_USERNAME,
+      credential: TURN_PASSWORD,
+    },
+    {
+      urls: `turn:${TURN_URL}:3478?transport=tcp`,
+      username: TURN_USERNAME,
+      credential: TURN_PASSWORD,
+    },
   ],
+  iceCandidatePoolSize: 10,
 };
 
 export class WebRTCService {

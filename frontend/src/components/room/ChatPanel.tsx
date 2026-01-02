@@ -17,12 +17,16 @@ export function ChatPanel({ roomId }: ChatPanelProps) {
 
   useEffect(() => {
     const handleMessage = (data: unknown) => {
-      addMessage(data as Message);
+      const chatData = data as { type: string; message: Message };
+      // Không thêm tin nhắn của chính mình (đã optimistic update)
+      if (chatData.message?.senderId !== user?.id) {
+        addMessage(chatData.message);
+      }
     };
 
-    socketService.on('chat:message', handleMessage);
-    return () => socketService.off('chat:message', handleMessage);
-  }, [addMessage]);
+    socketService.on('chat-message', handleMessage);
+    return () => socketService.off('chat-message', handleMessage);
+  }, [addMessage, user?.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
