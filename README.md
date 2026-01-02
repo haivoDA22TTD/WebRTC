@@ -1,112 +1,108 @@
-# WebRTC Video Meeting Application
+# 🎥 HỆ THỐNG WEBRTC GIAO TIẾP THỜI GIAN THỰC
 
-Ứng dụng video meeting giống Google Meet với giao diện Discord, sử dụng WebRTC, React TypeScript, Spring Boot Microservices.
+> Hệ thống giao tiếp thời gian thực dựa trên **WebRTC**, được xây dựng theo **kiến trúc Microservices**, hỗ trợ nhắn tin realtime, gọi video/audio, quản lý phòng và xác thực người dùng.
 
-## Tech Stack
+![WebRTC](https://img.shields.io/badge/WebRTC-Realtime-green)
+![Microservices](https://img.shields.io/badge/Kiến%20trúc-Microservices-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Backend-brightgreen)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED)
+![CI/CD](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-black)
 
-### Frontend
-- React 19 + TypeScript + Vite
-- Tailwind CSS
-- Zustand (State Management)
-- Socket.io Client
-- WebRTC Native API
+---
 
-### Backend (Microservices)
-- Spring Boot 3.5.9
-- Spring Cloud (Eureka, Gateway)
-- MongoDB
-- Redis
-- Apache Kafka
-- WebSocket
+## 📌 Giới thiệu
 
-## Architecture
+Đây là một **ứng dụng WebRTC giao tiếp thời gian thực**, cho phép người dùng:
 
-```
-┌─────────────┐     ┌─────────────┐
-│   Frontend  │────▶│   Gateway   │
-│  (React)    │     │   (8080)    │
-└─────────────┘     └──────┬──────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│ Auth Service  │  │ Room Service  │  │ Chat Service  │
-│    (8081)     │  │    (8082)     │  │    (8084)     │
-└───────────────┘  └───────────────┘  └───────────────┘
-        │                  │                  │
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│   MongoDB     │  │    Redis      │  │    Kafka      │
-└───────────────┘  └───────────────┘  └───────────────┘
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │   Signaling   │
-                   │    (8083)     │
-                   └───────────────┘
-```
+- Nhắn tin realtime
+- Gọi video / audio
+- Tạo và tham gia phòng
+- Quản lý thông tin cá nhân
+- Xác thực và phân quyền người dùng
 
-## Services
+Hệ thống được thiết kế theo **mô hình Microservices**, dễ mở rộng, bảo trì và triển khai bằng **Docker** kết hợp **CI/CD GitHub Actions**.
 
-| Service | Port | Description |
-|---------|------|-------------|
-| Gateway | 8080 | API Gateway + Eureka Server |
-| Auth | 8081 | Authentication & Authorization |
-| Room | 8082 | Room Management |
-| Signaling | 8083 | WebRTC Signaling (WebSocket) |
-| Chat | 8084 | In-call Chat |
-| Profile | 8085 | User Profiles |
-| Frontend | 5173 | React Application |
+---
 
-## Quick Start
+## 🚀 Chức năng chính
 
-### Development (Local)
+- 🔐 **Xác thực & phân quyền người dùng**
+- 💬 **Nhắn tin thời gian thực (WebSocket)**
+- 🎥 **Gọi video / audio bằng WebRTC**
+- 🏠 **Quản lý phòng (Room)**
+- 👤 **Quản lý hồ sơ người dùng**
+- 🌐 **API Gateway** trung tâm
+- 🐳 **Triển khai bằng Docker**
+- 🔁 **Tự động CI/CD**
 
-1. Start infrastructure:
-```bash
-docker-compose up -d mongodb redis zookeeper kafka
-```
+---
 
-2. Start backend services (in separate terminals):
-```bash
-cd gateway && ./mvnw spring-boot:run
-cd auth && ./mvnw spring-boot:run
-cd room && ./mvnw spring-boot:run
-cd signaling && ./mvnw spring-boot:run
-cd chat && ./mvnw spring-boot:run
-cd profile && ./mvnw spring-boot:run
-```
 
-3. Start frontend:
-```bash
-cd frontend && npm run dev
-```
+### Mô tả:
+- **Frontend**: Giao diện người dùng, xử lý media stream WebRTC
+- **Signaling Service**: Trao đổi SDP & ICE Candidate
+- **Chat Service**: Nhắn tin realtime
+- **Auth Service**: Đăng nhập, xác thực JWT
+- **API Gateway**: Điều hướng request
+- **Các service hoạt động độc lập**
 
-### Docker (Production)
+---
+
+## 🛠️ Công nghệ sử dụng
+
+### 🔹 Backend
+- ☕ **Java**
+- 🌱 **Spring Boot**
+- 🔐 **Spring Security**
+- 🌐 **WebSocket**
+- 🎥 **WebRTC Signaling**
+- <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mongodb.svg" width="18"/> **MongoDB**
+
+### 🔹 Frontend
+- ⚛️ **React**
+- 📘 **TypeScript**
+- 🎨 **CSS**
+
+### 🔹 DevOps
+- 🐳 **Docker & Docker Compose**
+- 🔁 **GitHub Actions (CI/CD)**
+- 🌐 **Nginx**
+
+---
+
+## 📥 Hướng dẫn clone dự án
 
 ```bash
-docker-compose up --build
+git clone https://github.com/haivoDA22TTD/WebRTC.git
+cd WebRTC
 ```
-
-Access: http://localhost:5173
-
-## Features
-
-- [x] User Authentication (Register/Login)
-- [x] Create/Join Meeting Rooms
-- [x] Video/Audio Calls (WebRTC)
-- [x] Screen Sharing
-- [x] In-call Chat
-- [x] Mute/Unmute Audio
-- [x] Enable/Disable Video
-- [x] Participant List
-- [x] Discord-like UI
-
-## Environment Variables
-
-Create `.env` file in frontend:
+## ▶️ Chạy ứng dụng bằng Docker
+```bash
+  docker-compose up --build
 ```
-VITE_API_URL=http://localhost:8080/api
-VITE_SOCKET_URL=http://localhost:8083
-```
+## Truy cập
+
+🌐 Frontend: http://localhost:5173
+
+🚪 API Gateway: http://localhost:8080
+
+🔐 Luồng xác thực
+
+## 📈 Hướng phát triển trong tương lai
+
+📱 Hỗ trợ thiết bị di động
+
+👥 Gọi nhóm nhiều người
+
+📊 Monitoring (Prometheus, Grafana)
+
+🔔 Notification Service
+
+☁️ Triển khai Cloud (AWS / GCP)
+
+## 👨‍💻 Tác giả
+Võ Chí Hải(**haivoDev**)
+## ⭐ Đóng góp
+
+Nếu bạn thấy dự án hữu ích, hãy ⭐ Star repository để ủng hộ nhé!
