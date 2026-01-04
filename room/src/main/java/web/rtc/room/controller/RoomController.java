@@ -76,6 +76,22 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
         return ResponseEntity.ok(room.getParticipants());
     }
+
+    @PostMapping("/{roomId}/invite")
+    public ResponseEntity<?> inviteToRoom(
+            @PathVariable String roomId,
+            @RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String inviteeId = request.get("inviteeId");
+        String frontendUrl = request.getOrDefault("frontendUrl", "http://localhost:5173");
+        
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
+        }
+        
+        roomService.inviteToRoom(roomId, email, inviteeId, frontendUrl);
+        return ResponseEntity.ok(Map.of("message", "Invitation sent successfully"));
+    }
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception e) {

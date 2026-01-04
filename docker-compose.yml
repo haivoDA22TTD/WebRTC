@@ -20,6 +20,16 @@ services:
     networks:
       - webrtc-network
 
+  # Mailhog (Fake SMTP for development)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: webrtc-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - webrtc-network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: webrtc-zookeeper
@@ -220,6 +230,33 @@ services:
       mongodb:
         condition: service_started
       redis:
+        condition: service_started
+    networks:
+      - webrtc-network
+
+  notification-service:
+    build: ./notification
+    container_name: webrtc-notification
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_notification
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+      kafka:
         condition: service_started
     networks:
       - webrtc-network

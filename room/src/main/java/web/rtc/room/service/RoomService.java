@@ -35,10 +35,14 @@ public class RoomService {
         
         room = roomRepository.save(room);
         
+        // Send notification event
         sendEvent("room-events", Map.of(
-            "type", "ROOM_CREATED",
+            "type", "room-created",
             "roomId", room.getId(),
-            "hostId", hostId
+            "roomCode", code,
+            "roomName", name,
+            "hostId", hostId,
+            "hostName", hostDisplayName
         ));
         
         return room;
@@ -63,11 +67,14 @@ public class RoomService {
             room.getParticipants().add(participant);
             room = roomRepository.save(room);
             
+            // Send notification to host
             sendEvent("room-events", Map.of(
-                "type", "USER_JOINED",
+                "type", "user-joined",
                 "roomId", room.getId(),
+                "roomCode", code,
+                "hostId", room.getHostId(),
                 "userId", userId,
-                "displayName", displayName
+                "userName", displayName
             ));
         }
         
@@ -78,7 +85,16 @@ public class RoomService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
+        // Get user display name before removing
+        String userName = room.getParticipants().stream()
+                .filter(p -> p.getUserId().equals(userId))
+                .findFirst()
+                .map(Participant::getDisplayName)
+                .orElse("Unknown");
+
         room.getParticipants().removeIf(p -> p.getUserId().equals(userId));
+        
+        String hostId = room.getHostId();
         
         if (room.getParticipants().isEmpty()) {
             room.setActive(false);
@@ -87,20 +103,52 @@ public class RoomService {
             Participant newHost = room.getParticipants().get(0);
             newHost.setHost(true);
             room.setHostId(newHost.getUserId());
+            hostId = newHost.getUserId();
         }
         
         roomRepository.save(room);
         
-        sendEvent("room-events", Map.of(
-            "type", "USER_LEFT",
-            "roomId", roomId,
-            "userId", userId
-        ));
+        // Send notification to host
+        if (!room.getParticipants().isEmpty()) {
+            sendEvent("room-events", Map.of(
+                "type", "user-left",
+                "roomId", roomId,
+                "hostId", hostId,
+                "userId", userId,
+                "userName", userName
+            ));
+        }
     }
 
     public Room getRoom(String roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
+    }
+
+    public void inviteToRoom(String roomId, String inviteeEmail, String inviteeId, String frontendUrl) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // Get host info
+        Participant host = room.getParticipants().stream()
+                .filter(Participant::isHost)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Host not found"));
+
+        String roomLink = frontendUrl + "/join/" + room.getCode();
+
+        // Send meeting invite event
+        sendEvent("room-events", Map.of(
+            "type", "meeting-invite",
+            "roomId", roomId,
+            "roomCode", room.getCode(),
+            "roomName", room.getName(),
+            "roomLink", roomLink,
+            "hostId", room.getHostId(),
+            "hostName", host.getDisplayName(),
+            "inviteeId", inviteeId != null ? inviteeId : "",
+            "inviteeEmail", inviteeEmail
+        ));
     }
 
     private String generateRoomCode() {

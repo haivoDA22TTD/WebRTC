@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lời mời tham gia cuộc họp</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #5865f2; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
+        .btn { display: inline-block; background: #5865f2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 15px; }
+        .btn:hover { background: #4752c4; }
+        .room-code { background: #e3e5e8; padding: 10px 20px; border-radius: 4px; font-size: 24px; font-weight: bold; letter-spacing: 2px; display: inline-block; margin: 10px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Lời mời tham gia cuộc họp</h1>
+        </div>
+        <div class="content">
+            <p>Xin chào,</p>
+            <p><strong th:text="${hostName}">Host</strong> đã mời bạn tham gia cuộc họp video.</p>
+            
+            <p>Mã phòng:</p>
+            <div class="room-code" th:text="${roomCode}">ABC123</div>
+            
+            <p>
+                <a th:href="${roomLink}" class="btn">Tham gia ngay</a>
+            </p>
+            
+            <p style="margin-top: 20px; color: #666;">
+                Hoặc truy cập link: <a th:href="${roomLink}" th:text="${roomLink}">Link</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2025 WebRTC Meeting. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

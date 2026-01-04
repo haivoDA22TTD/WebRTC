@@ -1,9 +1,10 @@
-import { Bell, Search, Settings } from 'lucide-react';
+import { Search, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore, themeColors } from '../../stores/themeStore';
 import { Avatar } from '../ui/Avatar';
 import { ThemeSelectorCompact } from '../ui/ThemeSelector';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export function Header() {
   const navigate = useNavigate();
@@ -47,13 +48,7 @@ export function Header() {
         </div>
 
         {/* Notifications */}
-        <button className="relative p-2 text-[#b5bac1] hover:text-white hover:bg-[#35363c] rounded-lg transition-all">
-          <Bell size={20} />
-          <span 
-            className="absolute top-1 right-1 w-2 h-2 rounded-full"
-            style={{ backgroundColor: theme.primary }}
-          />
-        </button>
+        <NotificationDropdown />
 
         {/* Settings */}
         <button 

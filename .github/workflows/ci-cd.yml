@@ -320,9 +320,42 @@ jobs:
     outputs:
       changed: ${{ steps.changes.outputs.src }}
 
+  # ==================== NOTIFICATION SERVICE ====================
+  notification:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: notification
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'notification/**'
+
+      - name: Setup Java 17
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: notification/pom.xml
+
+      - name: Build & Test
+        if: steps.changes.outputs.src == 'true'
+        run: ./mvnw clean verify -B
+
+    outputs:
+      changed: ${{ steps.changes.outputs.src }}
+
   # ==================== BUILD & PUSH DOCKER IMAGES ====================
   docker:
-    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server, sfu]
+    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server, sfu, notification]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -350,6 +383,8 @@ jobs:
             context: ./eureka-server
           - service: sfu
             context: ./sfu
+          - service: notification
+            context: ./notification
     steps:
       - uses: actions/checkout@v4
 
@@ -366,6 +401,7 @@ jobs:
             profile) echo "changed=${{ needs.profile.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             eureka-server) echo "changed=${{ needs.eureka-server.outputs.changed }}" >> $GITHUB_OUTPUT ;;
             sfu) echo "changed=${{ needs.sfu.outputs.changed }}" >> $GITHUB_OUTPUT ;;
+            notification) echo "changed=${{ needs.notification.outputs.changed }}" >> $GITHUB_OUTPUT ;;
           esac
 
       - name: Login to GitHub Container Registry

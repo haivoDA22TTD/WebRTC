@@ -61,6 +61,11 @@ export const roomApi = {
   leave: (roomId: string) => roomApi$.post(`/rooms/${roomId}/leave`),
   get: (roomId: string) => roomApi$.get(`/rooms/${roomId}`),
   getParticipants: (roomId: string) => roomApi$.get(`/rooms/${roomId}/participants`),
+  invite: (roomId: string, email: string) => 
+    roomApi$.post(`/rooms/${roomId}/invite`, { 
+      email, 
+      frontendUrl: window.location.origin 
+    }),
 };
 
 // Profile API

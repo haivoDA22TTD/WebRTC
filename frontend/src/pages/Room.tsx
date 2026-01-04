@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Mic, MicOff, Video, VideoOff, Monitor, MonitorOff,
-  MessageSquare, Phone, Users, Copy, Check
+  MessageSquare, Phone, Users, Copy, Check, UserPlus
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useRoomStore } from '../stores/roomStore';
@@ -12,6 +12,7 @@ import { socketService } from '../services/socket';
 import { webrtcService } from '../services/webrtc';
 import { ChatPanel } from '../components/room/ChatPanel';
 import { ParticipantsList } from '../components/room/ParticipantsList';
+import { InviteModal } from '../components/room/InviteModal';
 
 interface RemoteStream {
   oderId: string;
@@ -42,6 +43,7 @@ export function Room() {
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const [showParticipants, setShowParticipants] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Map<string, RemoteStream>>(new Map());
@@ -424,6 +426,15 @@ export function Room() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowInviteModal(true)}
+            className="hidden sm:flex items-center gap-1"
+          >
+            <UserPlus size={14} />
+            Mời
+          </Button>
           <span className="text-[#b5bac1] text-sm">
             {participants.length + 1} người tham gia
           </span>
@@ -517,6 +528,15 @@ export function Room() {
         {isChatOpen && <ChatPanel roomId={roomId!} />}
         {showParticipants && <ParticipantsList />}
       </div>
+
+      {/* Invite Modal */}
+      {showInviteModal && currentRoom && (
+        <InviteModal
+          roomId={roomId!}
+          roomCode={currentRoom.code}
+          onClose={() => setShowInviteModal(false)}
+        />
+      )}
 
       {/* Controls */}
       <div className="h-16 md:h-20 bg-[#2b2d31] flex items-center justify-center gap-2 md:gap-3 px-2 md:px-4 shrink-0">
