@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { Bell, Check, CheckCheck, Users, Video, LogOut, Mail } from 'lucide-react';
 import { useNotificationStore } from '../../stores/notificationStore';
 import type { Notification } from '../../stores/notificationStore';
@@ -17,13 +17,13 @@ function NotificationItem({ notification, onRead }: { notification: Notification
   const { themeColor } = useThemeStore();
   const theme = themeColors[themeColor];
 
-  const timeAgo = (date: string) => {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  const timeAgo = useMemo(() => {
+    const seconds = Math.floor((Date.now() - new Date(notification.createdAt).getTime()) / 1000);
     if (seconds < 60) return 'Vừa xong';
     if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`;
     return `${Math.floor(seconds / 86400)} ngày trước`;
-  };
+  }, [notification.createdAt]);
 
   return (
     <div
@@ -42,7 +42,7 @@ function NotificationItem({ notification, onRead }: { notification: Notification
         <div className="flex-1 min-w-0">
           <p className="text-sm text-white font-medium truncate">{notification.title}</p>
           <p className="text-xs text-[#b5bac1] truncate">{notification.message}</p>
-          <p className="text-xs text-[#6d6f78] mt-1">{timeAgo(notification.createdAt)}</p>
+          <p className="text-xs text-[#6d6f78] mt-1">{timeAgo}</p>
         </div>
         {!notification.read && (
           <div

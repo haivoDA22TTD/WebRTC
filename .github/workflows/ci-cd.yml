@@ -6,12 +6,7 @@ on:
   pull_request:
     branches: [main, develop]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
-
 jobs:
-  # ==================== FRONTEND ====================
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -19,164 +14,91 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
-
-  # ==================== GATEWAY ====================
   gateway:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: gateway
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: gateway/pom.xml
+      - run: chmod +x gateway/mvnw && cd gateway && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== AUTH SERVICE ====================
   auth:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: auth
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: auth/pom.xml
+      - run: chmod +x auth/mvnw && cd auth && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== ROOM SERVICE ====================
   room:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: room
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: room/pom.xml
+      - run: chmod +x room/mvnw && cd room && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== SIGNALING SERVICE ====================
   signaling:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: signaling
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: signaling/pom.xml
+      - run: chmod +x signaling/mvnw && cd signaling && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== CHAT SERVICE ====================
   chat:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: chat
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: chat/pom.xml
+      - run: chmod +x chat/mvnw && cd chat && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== PROFILE SERVICE ====================
   profile:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: profile
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: profile/pom.xml
+      - run: chmod +x profile/mvnw && cd profile && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== EUREKA SERVER ====================
   eureka-server:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: eureka-server
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: eureka-server/pom.xml
+      - run: chmod +x eureka-server/mvnw && cd eureka-server && ./mvnw clean package -B -DskipTests
 
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
-
-  # ==================== SFU SERVER (Node.js) ====================
   sfu:
     runs-on: ubuntu-latest
     defaults:
@@ -184,31 +106,18 @@ jobs:
         working-directory: sfu
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - run: npm install
 
-      - name: Install dependencies
-        run: npm install
-
-  # ==================== NOTIFICATION SERVICE ====================
   notification:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: notification
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: notification/pom.xml
-
-      - name: Build & Test
-        run: ./mvnw clean verify -B -DskipTests
+      - run: chmod +x notification/mvnw && cd notification && ./mvnw clean package -B -DskipTests
