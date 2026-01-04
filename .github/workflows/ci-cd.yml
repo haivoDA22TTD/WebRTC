@@ -20,16 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'frontend/**'
-
       - name: Setup Node.js
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -37,27 +28,13 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        if: steps.changes.outputs.src == 'true'
         run: npm ci
 
       - name: Lint
-        if: steps.changes.outputs.src == 'true'
         run: npm run lint
 
       - name: Build
-        if: steps.changes.outputs.src == 'true'
         run: npm run build
-
-      - name: Upload build artifact
-        if: steps.changes.outputs.src == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-          retention-days: 1
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
 
   # ==================== GATEWAY ====================
   gateway:
@@ -68,16 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'gateway/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -86,11 +54,7 @@ jobs:
           cache-dependency-path: gateway/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== AUTH SERVICE ====================
   auth:
@@ -101,16 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'auth/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -119,11 +74,7 @@ jobs:
           cache-dependency-path: auth/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== ROOM SERVICE ====================
   room:
@@ -134,16 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'room/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -152,11 +94,7 @@ jobs:
           cache-dependency-path: room/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== SIGNALING SERVICE ====================
   signaling:
@@ -167,16 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'signaling/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -185,11 +114,7 @@ jobs:
           cache-dependency-path: signaling/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== CHAT SERVICE ====================
   chat:
@@ -200,16 +125,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'chat/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -218,11 +134,7 @@ jobs:
           cache-dependency-path: chat/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== PROFILE SERVICE ====================
   profile:
@@ -233,16 +145,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'profile/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -251,11 +154,7 @@ jobs:
           cache-dependency-path: profile/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== EUREKA SERVER ====================
   eureka-server:
@@ -266,16 +165,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'eureka-server/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -284,11 +174,7 @@ jobs:
           cache-dependency-path: eureka-server/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
+        run: ./mvnw clean verify -B -DskipTests
 
   # ==================== SFU SERVER (Node.js) ====================
   sfu:
@@ -299,26 +185,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'sfu/**'
-
       - name: Setup Node.js
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
-        if: steps.changes.outputs.src == 'true'
         run: npm install
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
 
   # ==================== NOTIFICATION SERVICE ====================
   notification:
@@ -329,16 +202,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'notification/**'
-
       - name: Setup Java 17
-        if: steps.changes.outputs.src == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -347,109 +211,4 @@ jobs:
           cache-dependency-path: notification/pom.xml
 
       - name: Build & Test
-        if: steps.changes.outputs.src == 'true'
-        run: ./mvnw clean verify -B
-
-    outputs:
-      changed: ${{ steps.changes.outputs.src }}
-
-  # ==================== BUILD & PUSH DOCKER IMAGES ====================
-  docker:
-    needs: [frontend, gateway, auth, room, signaling, chat, profile, eureka-server, sfu, notification]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - service: frontend
-            context: ./frontend
-          - service: gateway
-            context: ./gateway
-          - service: auth
-            context: ./auth
-          - service: room
-            context: ./room
-          - service: signaling
-            context: ./signaling
-          - service: chat
-            context: ./chat
-          - service: profile
-            context: ./profile
-          - service: eureka-server
-            context: ./eureka-server
-          - service: sfu
-            context: ./sfu
-          - service: notification
-            context: ./notification
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check if service changed
-        id: check
-        run: |
-          case "${{ matrix.service }}" in
-            frontend) echo "changed=${{ needs.frontend.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            gateway) echo "changed=${{ needs.gateway.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            auth) echo "changed=${{ needs.auth.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            room) echo "changed=${{ needs.room.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            signaling) echo "changed=${{ needs.signaling.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            chat) echo "changed=${{ needs.chat.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            profile) echo "changed=${{ needs.profile.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            eureka-server) echo "changed=${{ needs.eureka-server.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            sfu) echo "changed=${{ needs.sfu.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-            notification) echo "changed=${{ needs.notification.outputs.changed }}" >> $GITHUB_OUTPUT ;;
-          esac
-
-      - name: Login to GitHub Container Registry
-        if: steps.check.outputs.changed == 'true'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        if: steps.check.outputs.changed == 'true'
-        uses: docker/setup-buildx-action@v3
-
-      - name: Extract metadata
-        if: steps.check.outputs.changed == 'true'
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}
-          tags: |
-            type=sha,prefix=
-            type=raw,value=latest
-
-      - name: Build and push ${{ matrix.service }}
-        if: steps.check.outputs.changed == 'true'
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ matrix.context }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ==================== DEPLOY (Uncomment and configure when ready) ====================
-  # deploy:
-  #   needs: docker
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Deploy to server via SSH
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.DEPLOY_HOST }}
-  #         username: ${{ secrets.DEPLOY_USER }}
-  #         key: ${{ secrets.DEPLOY_SSH_KEY }}
-  #         script: |
-  #           cd /path/to/your/app
-  #           docker-compose pull
-  #           docker-compose up -d --remove-orphans
+        run: ./mvnw clean verify -B -DskipTests
