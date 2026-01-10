@@ -1,4 +1,4 @@
-import { Home, Plus, Settings, LogOut, Video, Users, MessageSquare } from 'lucide-react';
+import { Home, Plus, Settings, LogOut, Video, Users, MessageSquare, BarChart3 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore, themeColors } from '../../stores/themeStore';
@@ -144,6 +144,13 @@ export function Sidebar() {
         label="Tin nhắn"
         onClick={() => navigate('/messages')}
         isActive={location.pathname === '/messages'}
+      />
+
+      <NavItem 
+        icon={<BarChart3 size={24} />}
+        label="Thống kê"
+        onClick={() => navigate('/analytics')}
+        isActive={location.pathname === '/analytics'}
       />
 
       {/* Spacer */}

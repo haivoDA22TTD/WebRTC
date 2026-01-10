@@ -1,0 +1,12 @@
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\AnalyticsApplication.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\config\SecurityConfig.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\controller\AnalyticsController.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\model\DailyStats.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\model\MeetingEvent.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\model\UserStats.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\repository\DailyStatsRepository.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\repository\MeetingEventRepository.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\repository\UserStatsRepository.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\scheduler\StatsAggregator.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\service\AnalyticsService.java
+D:\Web-RTC\analytics\src\main\java\web\rtc\analytics\service\KafkaConsumerService.java

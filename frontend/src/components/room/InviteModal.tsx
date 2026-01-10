@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Mail, Send, Loader2, Check, Copy } from 'lucide-react';
+import { X, Mail, Send, Loader2, Check, Copy, Bot } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { roomApi } from '../../services/api';
 
@@ -15,6 +15,8 @@ export function InviteModal({ roomId, roomCode, onClose }: InviteModalProps) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [botLoading, setBotLoading] = useState(false);
+  const [botInvited, setBotInvited] = useState(false);
 
   const roomLink = `${window.location.origin}/join/${roomCode}`;
 
@@ -45,6 +47,21 @@ export function InviteModal({ roomId, roomCode, onClose }: InviteModalProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const inviteAIBot = async () => {
+    setBotLoading(true);
+    setError('');
+    try {
+      await roomApi.inviteBot(roomCode);
+      setBotInvited(true);
+      setTimeout(() => setBotInvited(false), 5000);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || 'Không thể mời AI Bot. Hãy chắc chắn AI Bot service đang chạy.');
+    } finally {
+      setBotLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-[#313338] rounded-lg w-full max-w-md">
@@ -56,10 +73,58 @@ export function InviteModal({ roomId, roomCode, onClose }: InviteModalProps) {
         </div>
 
         <div className="p-4 space-y-4">
+          {/* AI Bot invite */}
+          <div className="bg-gradient-to-r from-[#5865f2]/20 to-[#eb459e]/20 rounded-lg p-4 border border-[#5865f2]/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#5865f2] to-[#eb459e] rounded-full flex items-center justify-center">
+                <Bot size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-medium">AI Assistant</h3>
+                <p className="text-[#b5bac1] text-xs">Trợ lý ảo thông minh</p>
+              </div>
+            </div>
+            <p className="text-[#b5bac1] text-sm mb-3">
+              Mời AI Bot tham gia cuộc họp để hỗ trợ trả lời câu hỏi và ghi chú.
+            </p>
+            <Button 
+              onClick={inviteAIBot} 
+              disabled={botLoading || botInvited}
+              className="w-full"
+              variant={botInvited ? 'secondary' : 'primary'}
+            >
+              {botLoading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin mr-2" />
+                  Đang mời...
+                </>
+              ) : botInvited ? (
+                <>
+                  <Check size={16} className="mr-2" />
+                  Đã mời AI Bot
+                </>
+              ) : (
+                <>
+                  <Bot size={16} className="mr-2" />
+                  Mời AI Bot
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#3f4147]"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-[#313338] text-[#b5bac1]">hoặc mời người</span>
+            </div>
+          </div>
+
           {/* Copy link section */}
           <div>
             <label className="block text-[#b5bac1] text-sm mb-2">
-              Hoặc chia sẻ link phòng họp
+              Chia sẻ link phòng họp
             </label>
             <div className="flex gap-2">
               <input

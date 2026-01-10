@@ -191,6 +191,18 @@ export function Room() {
             isHost: false,
             joinedAt: new Date().toISOString()
           });
+          
+          // Create peer connection and send offer to new user
+          if (stream && userId !== user?.id) {
+            try {
+              webrtcService.createPeerConnection(userId);
+              const offer = await webrtcService.createOffer(userId);
+              socketService.sendOffer(userId, offer);
+              console.log('Sent offer to new user:', userId);
+            } catch (e) {
+              console.error('Failed to create offer for new user:', userId, e);
+            }
+          }
         }
       });
 

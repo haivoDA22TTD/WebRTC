@@ -5,6 +5,8 @@ const AUTH_URL = import.meta.env.VITE_AUTH_URL || 'http://localhost:8081';
 const ROOM_URL = import.meta.env.VITE_ROOM_URL || 'http://localhost:8082';
 const CHAT_URL = import.meta.env.VITE_CHAT_URL || 'http://localhost:8084';
 const PROFILE_URL = import.meta.env.VITE_PROFILE_URL || 'http://localhost:8085';
+const ANALYTICS_URL = import.meta.env.VITE_ANALYTICS_URL || 'http://localhost:8087';
+const AI_BOT_URL = import.meta.env.VITE_AI_BOT_URL || 'http://localhost:8088';
 
 const createApi = (baseURL: string) => {
   const instance = axios.create({
@@ -43,6 +45,8 @@ const authApi$ = createApi(AUTH_URL);
 const roomApi$ = createApi(ROOM_URL);
 const chatApi$ = createApi(CHAT_URL);
 const profileApi$ = createApi(PROFILE_URL);
+const analyticsApi$ = createApi(ANALYTICS_URL);
+const aiBotApi$ = createApi(AI_BOT_URL);
 
 // Auth API
 export const authApi = {
@@ -66,6 +70,7 @@ export const roomApi = {
       email, 
       frontendUrl: window.location.origin 
     }),
+  inviteBot: (roomCode: string) => aiBotApi$.post('/bot/join', { roomCode }),
 };
 
 // Profile API
@@ -81,4 +86,12 @@ export const chatApi = {
     chatApi$.get(`/chat/${roomId}/messages`, { params: { page, size } }),
   sendMessage: (roomId: string, content: string) =>
     chatApi$.post(`/chat/${roomId}/messages`, { content }),
+};
+
+// Analytics API
+export const analyticsApi = {
+  getDashboard: () => analyticsApi$.get('/analytics/dashboard'),
+  getDailyStats: (days = 7) => analyticsApi$.get(`/analytics/daily?days=${days}`),
+  getUserStats: (userId: string) => analyticsApi$.get(`/analytics/users/${userId}`),
+  getRecentEvents: (limit = 20) => analyticsApi$.get(`/analytics/events?limit=${limit}`),
 };

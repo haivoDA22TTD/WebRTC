@@ -7,6 +7,7 @@ import { Home } from './pages/Home';
 import { CreateRoom } from './pages/CreateRoom';
 import { Room } from './pages/Room';
 import { Settings } from './pages/Settings';
+import { Analytics } from './pages/Analytics';
 import { useAuthStore } from './stores/authStore';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/create-room" element={<CreateRoom />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/analytics" element={<Analytics />} />
           </Route>
           <Route path="/room/:roomId" element={<Room />} />
         </Route>

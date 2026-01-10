@@ -261,6 +261,51 @@ services:
     networks:
       - webrtc-network
 
+  # Analytics Service
+  analytics-service:
+    build: ./analytics
+    container_name: webrtc-analytics
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/webrtc_analytics
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
+    networks:
+      - webrtc-network
+
+  # AI Bot (Python)
+  ai-bot:
+    build: ./ai-bot
+    container_name: webrtc-ai-bot
+    ports:
+      - "8088:8088"
+    environment:
+      - SIGNALING_URL=ws://signaling-service:8083/ws/signaling
+      - AUTH_URL=http://auth-service:8081
+      - ROOM_URL=http://room-service:8082
+      - BOT_SERVER_PORT=8088
+      - BOT_EMAIL=ai-bot@webrtc.local
+      - BOT_PASSWORD=bot123456
+      - BOT_DISPLAY_NAME=AI Assistant
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OLLAMA_URL=http://host.docker.internal:11434
+    depends_on:
+      - auth-service
+      - room-service
+      - signaling-service
+    networks:
+      - webrtc-network
+
   # Frontend
   frontend:
     build: ./frontend

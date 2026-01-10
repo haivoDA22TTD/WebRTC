@@ -38,7 +38,27 @@ export interface Participant {
   isMuted: boolean;
   isVideoOff: boolean;
   isScreenSharing: boolean;
+  isBot?: boolean;
   joinedAt: string;
+}
+
+// Analytics types
+export interface DailyStats {
+  id: string;
+  date: string;
+  totalMeetings: number;
+  totalParticipants: number;
+  totalDurationMinutes: number;
+  peakConcurrentUsers: number;
+}
+
+export interface UserStats {
+  id: string;
+  oderId: string;
+  totalMeetingsJoined: number;
+  totalMeetingsHosted: number;
+  totalMinutesInMeetings: number;
+  lastActiveAt: string;
 }
 
 // Chat types

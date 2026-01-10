@@ -1,0 +1,12 @@
+web\rtc\analytics\config\SecurityConfig.class
+web\rtc\analytics\controller\AnalyticsController.class
+web\rtc\analytics\model\UserStats.class
+web\rtc\analytics\AnalyticsApplication.class
+web\rtc\analytics\model\DailyStats.class
+web\rtc\analytics\service\AnalyticsService.class
+web\rtc\analytics\repository\UserStatsRepository.class
+web\rtc\analytics\scheduler\StatsAggregator.class
+web\rtc\analytics\repository\MeetingEventRepository.class
+web\rtc\analytics\service\KafkaConsumerService.class
+web\rtc\analytics\repository\DailyStatsRepository.class
+web\rtc\analytics\model\MeetingEvent.class
