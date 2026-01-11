@@ -1,108 +1,316 @@
-# 🎥 HỆ THỐNG WEBRTC GIAO TIẾP THỜI GIAN THỰC
+# 🎥 WebRTC Video Meeting Platform
 
-> Hệ thống giao tiếp thời gian thực dựa trên **WebRTC**, được xây dựng theo **kiến trúc Microservices**, hỗ trợ nhắn tin realtime, gọi video/audio, quản lý phòng và xác thực người dùng.
+Ứng dụng họp video trực tuyến với kiến trúc Microservices, tích hợp AI Bot thông minh.
 
-![WebRTC](https://img.shields.io/badge/WebRTC-Realtime-green)
-![Microservices](https://img.shields.io/badge/Kiến%20trúc-Microservices-blue)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Backend-brightgreen)
-![React](https://img.shields.io/badge/React-Frontend-61DAFB)
-![Docker](https://img.shields.io/badge/Docker-Container-2496ED)
-![CI/CD](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-black)
+![Tech Stack](https://img.shields.io/badge/React-19-blue) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.7-green) ![Python](https://img.shields.io/badge/Python-3.11-yellow) ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 
----
+> ⚠️ **CẢNH BÁO**: Dự án này đang trong giai đoạn **THỬ NGHIỆM (Beta)**. Một số tính năng có thể chưa ổn định hoặc đang được phát triển. Không khuyến khích sử dụng cho môi trường production.
 
-## 📌 Giới thiệu
+## ✨ Tính năng chính
 
-Đây là một **ứng dụng WebRTC giao tiếp thời gian thực**, cho phép người dùng:
+### 🎬 Video Conference
+- Gọi video/audio peer-to-peer với WebRTC
+- Chia sẻ màn hình
+- Bật/tắt camera và microphone
+- Hỗ trợ nhiều người tham gia cùng lúc
+- Giao diện Discord-like, responsive
 
-- Nhắn tin realtime
-- Gọi video / audio
-- Tạo và tham gia phòng
-- Quản lý thông tin cá nhân
-- Xác thực và phân quyền người dùng
+### 💬 Chat trong cuộc họp
+- Nhắn tin real-time trong phòng họp
+- Lưu trữ lịch sử tin nhắn
+- Thông báo khi có người vào/rời phòng
 
-Hệ thống được thiết kế theo **mô hình Microservices**, dễ mở rộng, bảo trì và triển khai bằng **Docker** kết hợp **CI/CD GitHub Actions**.
+### 🤖 AI Bot Assistant
+- Trợ lý AI tham gia cuộc họp như người dùng thật
+- Trả lời câu hỏi thông minh (Gemini/OpenAI/Ollama)
+- Avatar anime hoạt hình
+- Text-to-Speech tiếng Việt
 
----
+### 👤 Quản lý người dùng
+- Đăng ký/Đăng nhập với JWT
+- Hỗ trợ OAuth2
+- Quản lý profile và avatar
+- Mời người dùng qua email
 
-## 🚀 Chức năng chính
+### 📊 Analytics
+- Thống kê cuộc họp
+- Theo dõi số người tham gia
+- Lịch sử hoạt động
 
-- 🔐 **Xác thực & phân quyền người dùng**
-- 💬 **Nhắn tin thời gian thực (WebSocket)**
-- 🎥 **Gọi video / audio bằng WebRTC**
-- 🏠 **Quản lý phòng (Room)**
-- 👤 **Quản lý hồ sơ người dùng**
-- 🌐 **API Gateway** trung tâm
-- 🐳 **Triển khai bằng Docker**
-- 🔁 **Tự động CI/CD**
+## 🏗️ Kiến trúc hệ thống
 
----
+```
+                                    ┌─────────────────┐
+                                    │    Frontend     │
+                                    │  React + Vite   │
+                                    │     :5173       │
+                                    └────────┬────────┘
+                                             │
+                                    ┌────────▼────────┐
+                                    │     Gateway     │
+                                    │  Spring Cloud   │
+                                    │     :8080       │
+                                    └────────┬────────┘
+                                             │
+        ┌────────────────┬───────────────────┼───────────────────┬────────────────┐
+        │                │                   │                   │                │
+┌───────▼───────┐ ┌──────▼──────┐ ┌─────────▼─────────┐ ┌───────▼───────┐ ┌──────▼──────┐
+│     Auth      │ │    Room     │ │    Signaling      │ │     Chat      │ │   Profile   │
+│    :8081      │ │   :8082     │ │  WebSocket:8083   │ │    :8084      │ │   :8085     │
+└───────┬───────┘ └──────┬──────┘ └─────────┬─────────┘ └───────┬───────┘ └──────┬──────┘
+        │                │                   │                   │                │
+        └────────────────┴───────────────────┼───────────────────┴────────────────┘
+                                             │
+        ┌────────────────┬───────────────────┼───────────────────┬────────────────┐
+        │                │                   │                   │                │
+┌───────▼───────┐ ┌──────▼──────┐ ┌─────────▼─────────┐ ┌───────▼───────┐ ┌──────▼──────┐
+│   MongoDB     │ │    Redis    │ │      Kafka        │ │   AI Bot      │ │   coturn    │
+│   :27017      │ │   :6379     │ │      :9092        │ │   :8088       │ │   :3478     │
+└───────────────┘ └─────────────┘ └───────────────────┘ └───────────────┘ └─────────────┘
+```
 
+## 🛠️ Tech Stack
 
-### Mô tả:
-- **Frontend**: Giao diện người dùng, xử lý media stream WebRTC
-- **Signaling Service**: Trao đổi SDP & ICE Candidate
-- **Chat Service**: Nhắn tin realtime
-- **Auth Service**: Đăng nhập, xác thực JWT
-- **API Gateway**: Điều hướng request
-- **Các service hoạt động độc lập**
+### Frontend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React | 19 | UI Framework |
+| TypeScript | 5.x | Type Safety |
+| Vite | 7.x | Build Tool |
+| Tailwind CSS | 4.x | Styling |
+| Zustand | 5.x | State Management |
+| Axios | 1.x | HTTP Client |
 
----
+### Backend (Java)
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Spring Boot | 3.3.7 | Framework |
+| Spring Cloud | 2023.0.4 | Microservices |
+| Spring Security | - | Authentication |
+| MongoDB | 7 | Database |
+| Redis | 7 | Cache |
+| Kafka | 7.5 | Message Queue |
 
-## 🛠️ Công nghệ sử dụng
+### AI Bot (Python)
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| aiortc | 1.9.0 | WebRTC Client |
+| OpenCV | 4.9.0 | Video Processing |
+| edge-tts | 6.1.9 | Text-to-Speech |
+| Gemini/OpenAI | - | AI Response |
 
-### 🔹 Backend
-- ☕ **Java**
-- 🌱 **Spring Boot**
-- 🔐 **Spring Security**
-- 🌐 **WebSocket**
-- 🎥 **WebRTC Signaling**
-- <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mongodb.svg" width="18"/> **MongoDB**
+## 📦 Services
 
-### 🔹 Frontend
-- ⚛️ **React**
-- 📘 **TypeScript**
-- 🎨 **CSS**
+| Service | Port | Mô tả |
+|---------|------|-------|
+| Frontend | 5173 | Giao diện React |
+| Gateway | 8080 | API Gateway |
+| Eureka | 8761 | Service Discovery |
+| Auth | 8081 | Xác thực JWT |
+| Room | 8082 | Quản lý phòng họp |
+| Signaling | 8083 | WebRTC Signaling |
+| Chat | 8084 | Chat trong phòng |
+| Profile | 8085 | Hồ sơ người dùng |
+| Notification | 8086 | Thông báo email |
+| Analytics | 8087 | Thống kê |
+| AI Bot | 8088 | Trợ lý AI |
+| SFU | 4000 | Media Server |
 
-### 🔹 DevOps
-- 🐳 **Docker & Docker Compose**
-- 🔁 **GitHub Actions (CI/CD)**
-- 🌐 **Nginx**
+## 🚀 Cài đặt và Chạy
 
----
+### Yêu cầu
+- Docker & Docker Compose
+- Node.js 18+ (nếu chạy local)
+- Java 17+ (nếu chạy local)
+- Python 3.11+ (nếu chạy local)
 
-## 📥 Hướng dẫn clone dự án
-
+### 1. Clone repository
 ```bash
-git clone https://github.com/haivoDA22TTD/WebRTC.git
+git clone https://github.com/haivoDA22TTD/WebRTC
 cd WebRTC
 ```
-## ▶️ Chạy ứng dụng bằng Docker
+
+### 2. Cấu hình môi trường
 ```bash
-  docker-compose up --build
+cp .env.example .env
 ```
-## Truy cập
 
-🌐 Frontend: http://localhost:5173
+Chỉnh sửa file `.env`:
+```env
+# Email (Gmail App Password)
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=xxxx-xxxx-xxxx-xxxx
 
-🚪 API Gateway: http://localhost:8080
+# TURN Server
+TURN_REALM=webrtc.local
+TURN_SECRET=webrtc-secret-key
 
-🔐 Luồng xác thực
+# SFU
+SFU_ANNOUNCED_IP=127.0.0.1
 
-## 📈 Hướng phát triển trong tương lai
+# AI Bot (Google Gemini - FREE)
+GEMINI_API_KEY=your-gemini-api-key
+```
 
-📱 Hỗ trợ thiết bị di động
+### 3. Chạy với Docker Compose
 
-👥 Gọi nhóm nhiều người
+**Chạy tất cả services:**
+```bash
+docker-compose up -d
+```
 
-📊 Monitoring (Prometheus, Grafana)
+**Chạy từng phần:**
+```bash
+# Infrastructure
+docker-compose up -d mongodb redis kafka zookeeper
 
-🔔 Notification Service
+# Backend services
+docker-compose up -d eureka-server gateway auth-service room-service signaling-service chat-service
 
-☁️ Triển khai Cloud (AWS / GCP)
+# Frontend & AI Bot
+docker-compose up -d frontend ai-bot
+```
 
-## 👨‍💻 Tác giả
-Võ Chí Hải(**haivoDev**)
-## ⭐ Đóng góp
+### 4. Truy cập ứng dụng
+- **Frontend**: http://localhost:5173
+- **Eureka Dashboard**: http://localhost:8761
+- **Mailhog (Email test)**: http://localhost:8025
 
-Nếu bạn thấy dự án hữu ích, hãy ⭐ Star repository để ủng hộ nhé!
+## 📖 Hướng dẫn sử dụng
+
+### Tạo phòng họp
+1. Đăng ký/Đăng nhập tài khoản
+2. Click "Tạo phòng họp"
+3. Chia sẻ mã phòng cho người khác
+
+### Tham gia phòng họp
+1. Nhập mã phòng hoặc click link mời
+2. Cho phép truy cập camera/microphone
+3. Bắt đầu cuộc họp
+
+### Mời AI Bot
+1. Trong phòng họp, click "Mời"
+2. Chọn "Mời AI Bot"
+3. AI Assistant sẽ tham gia và trả lời câu hỏi
+
+### Các phím tắt
+| Phím | Chức năng |
+|------|-----------|
+| M | Bật/tắt microphone |
+| V | Bật/tắt camera |
+| S | Chia sẻ màn hình |
+| C | Mở/đóng chat |
+
+## 🔧 Development
+
+### Chạy Frontend local
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Chạy Backend local
+```bash
+# Mỗi service trong terminal riêng
+cd auth && ./mvnw spring-boot:run
+cd room && ./mvnw spring-boot:run
+cd signaling && ./mvnw spring-boot:run
+cd chat && ./mvnw spring-boot:run
+```
+
+### Chạy AI Bot local
+```bash
+cd ai-bot
+pip install -r requirements.txt
+python server.py
+```
+
+## 🔐 API Endpoints
+
+### Auth Service (8081)
+```
+POST /auth/register    - Đăng ký
+POST /auth/login       - Đăng nhập
+POST /auth/logout      - Đăng xuất
+GET  /auth/me          - Thông tin user
+```
+
+### Room Service (8082)
+```
+POST /rooms            - Tạo phòng
+POST /rooms/join/:code - Tham gia phòng
+GET  /rooms/:id        - Thông tin phòng
+POST /rooms/:id/leave  - Rời phòng
+POST /rooms/:id/invite - Mời qua email
+```
+
+### AI Bot (8088)
+```
+POST /bot/join         - Mời bot vào phòng
+POST /bot/leave        - Bot rời phòng
+GET  /bot/status       - Trạng thái bot
+GET  /health           - Health check
+```
+
+## 📁 Cấu trúc thư mục
+
+```
+webrtc-meeting/
+├── frontend/          # React Frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── stores/
+│   │   └── types/
+│   └── package.json
+├── auth/              # Auth Service (Spring Boot)
+├── room/              # Room Service
+├── signaling/         # Signaling Service
+├── chat/              # Chat Service
+├── profile/           # Profile Service
+├── notification/      # Notification Service
+├── analytics/         # Analytics Service
+├── gateway/           # API Gateway
+├── eureka-server/     # Service Discovery
+├── ai-bot/            # AI Bot (Python)
+│   ├── src/
+│   │   ├── bot.py
+│   │   ├── chatbot.py
+│   │   ├── video_generator.py
+│   │   └── webrtc_client.py
+│   └── requirements.txt
+├── sfu/               # Media Server (mediasoup)
+├── coturn/            # TURN Server config
+├── docker-compose.yml
+└── .env.example
+```
+
+## 🐛 Troubleshooting
+
+### Camera không hoạt động
+- Kiểm tra quyền truy cập camera trong browser
+- Đảm bảo không có ứng dụng khác đang dùng camera
+- Thử với browser khác (Chrome recommended)
+
+### Không kết nối được video
+- Kiểm tra TURN server đang chạy
+- Kiểm tra firewall không chặn port UDP
+- Xem console log để debug WebRTC
+
+### AI Bot không trả lời
+- Kiểm tra GEMINI_API_KEY trong .env
+- Xem logs: `docker logs webrtc-ai-bot`
+- Đảm bảo bot đã join room thành công
+
+## 📄 License
+
+MIT License
+
+
+---
+
+⭐ Nếu thấy hữu ích, hãy star repo này!
